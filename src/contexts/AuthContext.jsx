@@ -1,12 +1,16 @@
 // folioxe/src/contexts/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { auth } from '../firebase.js'; // Ensure this is correct
-import { /*...,*/ updateProfile, sendEmailVerification, signOut, onAuthStateChanged } from "firebase/auth";
-
+import { auth } from '../firebase.js'; // Ensure this path is correct
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail // Ensure this is imported
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  updateProfile,
+  sendEmailVerification,
+  sendPasswordResetEmail // Make sure this is imported if you're using it elsewhere
 } from "firebase/auth";
 
 const AuthContext = createContext(null);
@@ -24,26 +28,37 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log("--- onAuthStateChanged ---"); // Marker
+      console.log("--- onAuthStateChanged Triggered ---"); // For flow tracking
       if (firebaseUser) {
-        console.log("FirebaseUser object from onAuthStateChanged:", firebaseUser);
-        console.log("FirebaseUser UID:", firebaseUser.uid);
-        console.log("FirebaseUser Email:", firebaseUser.email);
-        console.log("FirebaseUser displayName:", firebaseUser.displayName); // CRUCIAL LOG
-        console.log("FirebaseUser emailVerified:", firebaseUser.emailVerified);
+        // LOGS TO CHECK FOR DISPLAYNAME FROM onAuthStateChanged
+        console.log("onAuthStateChanged: FirebaseUser Object RECVD:", firebaseUser);
+        console.log("onAuthStateChanged: FirebaseUser UID:", firebaseUser.uid);
+        console.log("onAuthStateChanged: FirebaseUser Email:", firebaseUser.email);
+        console.log("onAuthStateChanged: FirebaseUser displayName FROM FIREBASE:", firebaseUser.displayName); // <<< THIS IS A KEY LOG
+        console.log("onAuthStateChanged: FirebaseUser emailVerified:", firebaseUser.emailVerified);
+        console.log("onAuthStateChanged: FirebaseUser Provider Data:", firebaseUser.providerData);
 
-        // ... (your existing logic to set user and isAuthenticated based on firebaseUser) ...
         if (firebaseUser.providerData.some(provider => provider.providerId === 'password') && !firebaseUser.emailVerified) {
-          setUser({ uid: firebaseUser.uid, email: firebaseUser.email, displayName: firebaseUser.displayName, emailVerified: firebaseUser.emailVerified });
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            emailVerified: firebaseUser.emailVerified,
+          });
           setIsAuthenticated(false);
         } else {
-          setUser({ uid: firebaseUser.uid, email: firebaseUser.email, displayName: firebaseUser.displayName, emailVerified: firebaseUser.emailVerified });
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            emailVerified: firebaseUser.emailVerified,
+          });
           setIsAuthenticated(true);
         }
       } else {
-        console.log("No FirebaseUser from onAuthStateChanged (logged out).");
+        console.log("onAuthStateChanged: No FirebaseUser (logged out).");
         setUser(null);
         setIsAuthenticated(false);
       }
@@ -52,14 +67,15 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-    const signup = async (name, email, password) => {
+  const signup = async (name, email, password) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       if (userCredential.user) {
         console.log("Signup: User created. UID:", userCredential.user.uid);
         console.log("Signup: Attempting to update profile. DisplayName to set:", name);
         await updateProfile(userCredential.user, { displayName: name });
-        console.log("Signup: updateProfile call finished. Current Firebase user displayName:", auth.currentUser?.displayName); // Check immediately
+        // Log what auth.currentUser has immediately after updateProfile
+        console.log("Signup: updateProfile call finished. Current Firebase user (auth.currentUser) displayName:", auth.currentUser?.displayName);
 
         await sendEmailVerification(userCredential.user);
         console.log('Signup: Verification email sent.');
@@ -76,12 +92,13 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      if (userCredential.user && !userCredential.user.emailVerified) {
+      if (userCredential.user && userCredential.user.providerData.some(p => p.providerId === 'password') && !userCredential.user.emailVerified) {
         await signOut(auth);
         const verificationError = new Error('Email not verified. Please check your inbox for a verification link.');
         verificationError.code = 'auth/email-not-verified';
         throw verificationError;
       }
+      // onAuthStateChanged will handle setting user state based on userCredential.user
       return userCredential.user;
     } catch (error) {
       console.error("Firebase login error:", error.code, error.message);
@@ -93,6 +110,12 @@ export const AuthProvider = ({ children }) => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
+      console.log("--- loginWithGoogle successful ---"); // For flow tracking
+      // LOGS TO CHECK FOR DISPLAYNAME FROM GOOGLE SIGN-IN POPUP RESULT
+      console.log("loginWithGoogle: result.user object:", result.user);
+      console.log("loginWithGoogle: result.user.displayName FROM GOOGLE/FIREBASE:", result.user.displayName); // <<< THIS IS A KEY LOG
+      console.log("loginWithGoogle: result.user.email:", result.user.email);
+      // onAuthStateChanged will be triggered by signInWithPopup and set the global user state
       return result.user;
     } catch (error) {
       console.error("Firebase Google login error:", error.code, error.message);
@@ -103,6 +126,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await signOut(auth);
+      // onAuthStateChanged will handle setting user to null
     } catch (error) {
       console.error("Firebase logout error:", error.code, error.message);
       throw error;
@@ -110,7 +134,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const resendVerificationEmail = async () => {
-    if (auth.currentUser && !auth.currentUser.emailVerified) {
+    // Check if auth.currentUser is available and email is not verified
+    if (auth.currentUser && auth.currentUser.providerData.some(p => p.providerId === 'password') && !auth.currentUser.emailVerified) {
       try {
         await sendEmailVerification(auth.currentUser);
         return { message: "Verification email resent. Please check your inbox." };
@@ -121,11 +146,11 @@ export const AuthProvider = ({ children }) => {
     } else if (auth.currentUser && auth.currentUser.emailVerified) {
       throw new Error("Your email is already verified.");
     } else {
-      throw new Error("No user is currently signed in to resend verification for, or user is not from email/password provider.");
+      throw new Error("No user is currently signed in to resend verification for, or user is not an email/password user.");
     }
   };
 
-  const sendPasswordReset = async (email) => { // Added this function
+  const sendPasswordReset = async (email) => {
     try {
       await sendPasswordResetEmail(auth, email);
       return { message: "Password reset email sent. Please check your inbox." };
@@ -144,7 +169,7 @@ export const AuthProvider = ({ children }) => {
     loginWithGoogle,
     logout,
     resendVerificationEmail,
-    sendPasswordReset // Expose sendPasswordReset
+    sendPasswordReset
   };
 
   if (loading) {
