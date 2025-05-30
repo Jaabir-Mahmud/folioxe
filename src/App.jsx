@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar.jsx';
 import Footer from './components/layout/Footer.jsx';
-import ProtectedRoute from './components/auth/ProtectedRoute.jsx'; // 1. Import ProtectedRoute
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 
 import HomePage from './pages/HomePage.jsx';
 import ProductListingPage from './pages/ProductListingPage.jsx';
@@ -12,7 +12,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import UserProfilePage from './pages/UserProfilePage.jsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
-
+import SubmitProductPage from './pages/SubmitProductPage.jsx'; // 1. Import SubmitProductPage
 
 function App() {
   return (
@@ -36,25 +36,24 @@ function App() {
             <Route 
               path="/profile" 
               element={
-                <ProtectedRoute> {/* 2. Wrap UserProfilePage with ProtectedRoute */}
+                <ProtectedRoute>
                   <UserProfilePage />
                 </ProtectedRoute>
               } 
             />
-            {/* You can add more protected routes here later in the same way:
             <Route 
+              path="/submit-product" // Or "/sell", "/list-item", etc.
+              element={
+                <ProtectedRoute> {/* 2. Wrap SubmitProductPage with ProtectedRoute */}
+                  <SubmitProductPage />
+                </ProtectedRoute>
+              } 
+            />
+            {/* <Route 
               path="/dashboard" 
               element={
                 <ProtectedRoute>
                   <DashboardPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/submit-product" 
-              element={
-                <ProtectedRoute>
-                  <SubmitProductPage />
                 </ProtectedRoute>
               } 
             />

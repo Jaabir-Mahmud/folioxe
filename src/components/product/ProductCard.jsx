@@ -1,34 +1,38 @@
 // folioxe/src/components/product/ProductCard.jsx
 import React from 'react';
-import { Link } from 'react-router-dom'; // 1. Import Link
+import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
   const {
-    imageUrl = 'https://via.placeholder.com/400x300.png?text=Product+Image',
+    imageUrl = '/src/assets/image/default1.jpg', // Default local image
     title = 'Awesome Product Title',
     category = 'Category',
     author = 'Creative Studio',
     price = '$XX.XX',
-    slug = 'default-product-slug', // Ensure a fallback slug
+    slug = 'default-product-slug',
   } = product || {};
 
   const productDetailUrl = `/product/${slug}`;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 group">
-      <Link to={productDetailUrl} className="block"> {/* 2. Link for the image */}
-        <div className="relative pb-[75%]"> {/* Aspect ratio box for image (4:3) */}
+      <Link to={productDetailUrl} className="block">
+        <div className="relative pb-[75%]"> {/* Aspect ratio 4:3 */}
           <img
             className="absolute inset-0 w-full h-full object-cover"
             src={imageUrl}
             alt={title}
-            onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x300.png?text=Image+Error'; }}
+            onError={(e) => { 
+              e.target.onerror = null; 
+              e.target.src = 'src/assets/image/default2.jpg'; // Fallback to local error image
+            }}
           />
         </div>
       </Link>
 
       <div className="p-5">
-        <Link to={productDetailUrl} className="block"> {/* 3. Link for the title */}
+        {/* ... rest of the card content ... */}
+        <Link to={productDetailUrl} className="block">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {title}
           </h3>
@@ -44,16 +48,6 @@ const ProductCard = ({ product }) => {
             {price}
           </p>
         </div>
-        {/* Optional: If you want a dedicated "View Details" button later
-        <div className="mt-4">
-          <Link 
-            to={productDetailUrl}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-semibold"
-          >
-            View Details &rarr;
-          </Link>
-        </div>
-        */}
       </div>
     </div>
   );

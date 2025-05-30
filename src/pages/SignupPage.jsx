@@ -1,9 +1,5 @@
 // folioxe/src/pages/SignupPage.jsx
-// Your provided code for SignupPage.jsx already calls the context's signup function
-// and correctly informs the user about email verification because the AuthContext's signup
-// function now returns a message like "Signup successful. Please check your email...".
-// No changes are needed to this file for this specific part.
-// The code you pasted is up-to-date with what we discussed.
+
 import React, { useState } from 'react';
 import { Link, useNavigate,Navigate  } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';

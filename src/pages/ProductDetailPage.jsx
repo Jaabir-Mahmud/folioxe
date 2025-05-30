@@ -1,181 +1,180 @@
 // folioxe/src/pages/ProductDetailPage.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { db } from '../firebase.js'; // Import Firestore instance
+import { collection, query, where, getDocs } from 'firebase/firestore'; // Firestore functions
 
-// We'll use the same mock data structure for now.
-// In a real app, you'd fetch this by slug/ID from an API.
-// For now, let's redefine it here or ideally import from a shared mock data file.
-const mockProducts = [
-  {
-    slug: 'sleek-portfolio-template',
-    imageUrl: 'https://via.placeholder.com/800x600.png?text=Sleek+Portfolio+Large',
-    title: 'Sleek Portfolio Template',
-    category: 'Portfolio',
-    author: 'Studio UX',
-    price: '$29.00',
-    description: 'A stunning and modern portfolio template designed for creatives who want to showcase their work with elegance and simplicity. Fully responsive and easy to customize with well-organized layers and components.',
-    features: ['Fully Responsive', 'Easy to Customize', 'High Resolution', 'Well-organized Layers'],
-    rating: 4.5,
-    reviews: 12,
-  },
-  {
-    slug: 'minimalist-blog-theme',
-    imageUrl: 'https://via.placeholder.com/800x600.png?text=Minimalist+Blog+Large',
-    title: 'Minimalist Blog Theme',
-    category: 'WordPress Theme',
-    author: 'ThemeCrafters',
-    price: '$39.00',
-    description: 'A clean, minimalist WordPress theme perfect for bloggers and writers who want their content to shine. Optimized for readability and performance, with a focus on great typography and white space.',
-    features: ['SEO Optimized', 'Fast Loading', 'Gutenberg Ready', 'Multiple Layouts'],
-    rating: 5,
-    reviews: 8,
-  },
-  {
-    slug: 'e-commerce-ui-kit',
-    imageUrl: 'https://via.placeholder.com/800x600.png?text=E-commerce+Kit+Large',
-    title: 'E-commerce UI Kit',
-    category: 'UI Kit',
-    author: 'PixelPerfect',
-    price: '$49.00',
-    description: 'A comprehensive UI kit for e-commerce applications, featuring a wide range of components and screens. Perfect for jumpstarting your online store design with a professional and modern look.',
-    features: ['100+ Components', 'Vector Based', 'Style Guide Included', 'Dark & Light Mode'],
-    rating: 4,
-    reviews: 25,
-  },
-  {
-    slug: 'corporate-brand-identity',
-    imageUrl: 'https://via.placeholder.com/800x600.png?text=Corporate+Brand+Large',
-    title: 'Corporate Brand Identity',
-    category: 'Branding',
-    author: 'BrandMakers Inc.',
-    price: '$99.00',
-    description: 'A complete branding package for corporate businesses. Includes logo variations, color palettes, typography guidelines, and mockups for various marketing materials. Establish a strong brand presence instantly.',
-    features: ['Logo Files (AI, EPS, SVG)', 'Brand Guidelines PDF', 'Stationery Mockups', 'Social Media Kit'],
-    rating: 4.8,
-    reviews: 15,
-  },
-  {
-    slug: 'SaaS-landing-page',
-    imageUrl: 'https://via.placeholder.com/800x600.png?text=SaaS+Landing+Large',
-    title: 'SaaS Landing Page',
-    category: 'Web Template',
-    author: 'LaunchPro',
-    price: '$19.00',
-    description: 'A high-converting landing page template for SaaS products. Modern design, focused on showcasing features and driving sign-ups. Easy to integrate with your backend or marketing tools.',
-    features: ['Responsive Design', 'Conversion Optimized', 'Clean Code', 'Easy Integration'],
-    rating: 4.2,
-    reviews: 9,
-  },
-  {
-    slug: 'mobile-app-ui-concept',
-    imageUrl: 'https://via.placeholder.com/800x600.png?text=Mobile+App+UI+Large',
-    title: 'Mobile App UI Concept',
-    category: 'UI Kit',
-    author: 'App Designers Co.',
-    price: '$35.00',
-    description: 'A creative and modern UI concept for mobile applications. Includes multiple screens for common app flows. Perfect for inspiration or as a starting point for your next mobile project.',
-    features: ['Figma & Sketch Files', 'Pixel Perfect', 'User-friendly Flows', 'Multiple Screens'],
-    rating: 4.6,
-    reviews: 11,
-  },
-];
-
+// StarRating component can remain as is, or be moved to a separate file
+const StarRating = ({ rating, reviewsCount }) => {
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 !== 0; // This logic for half star is simplistic
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+  return (
+    <div className="flex items-center">
+      {[...Array(fullStars)].map((_, i) => (
+        <svg key={`full-${i}`} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 .09l2.939 5.865 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+      ))}
+      {/* Add more sophisticated half/empty star rendering if needed */}
+      {[...Array(emptyStars)].map((_, i) => (
+        <svg key={`empty-${i}`} className="w-5 h-5 text-gray-300 dark:text-gray-600 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 .09l2.939 5.865 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+      ))}
+      {reviewsCount > 0 && <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">({reviewsCount} reviews)</span>}
+    </div>
+  );
+};
 
 const ProductDetailPage = () => {
-  const { productSlug } = useParams(); // Get the slug from the URL
-  const product = mockProducts.find(p => p.slug === productSlug);
+  const { slug } = useParams(); // Get the 'slug' from the URL
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!slug) {
+        setLoading(false);
+        setError("No product slug provided.");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const productsCollectionRef = collection(db, "products");
+        // Query for the product with the matching slug
+        // Note: For this query to be efficient in Firestore, you'll need to create an index
+        // on the 'slug' field in your 'products' collection. Firestore will usually prompt you
+        // with a link in the console error message if an index is needed.
+        const q = query(productsCollectionRef, where("slug", "==", slug));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          console.log("No product found with slug:", slug);
+          setProduct(null); // Explicitly set to null if not found
+        } else {
+          // Assuming slugs are unique, there should be only one document
+          const docData = querySnapshot.docs[0].data();
+          setProduct({ id: querySnapshot.docs[0].id, ...docData });
+          console.log("Product fetched from Firestore:", { id: querySnapshot.docs[0].id, ...docData });
+        }
+      } catch (err) {
+        console.error("Error fetching product from Firestore:", err);
+        setError("Failed to load product details. " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [slug]); // Re-run effect if slug changes
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+        <p className="text-xl text-gray-700 dark:text-gray-300">Loading product details...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+        <p className="text-xl text-red-600 dark:text-red-400">{error}</p>
+        <Link to="/products" className="mt-6 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-colors">Back to Products</Link>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
         <h1 className="text-3xl font-bold text-red-600 dark:text-red-400">Product Not Found!</h1>
         <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-          Sorry, we couldn't find the product you're looking for.
+          Sorry, we couldn't find the product with slug: {slug}
         </p>
-        <Link to="/products" className="mt-6 inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+        <Link 
+          to="/products" 
+          className="mt-6 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+        >
           Back to Products
         </Link>
       </div>
     );
   }
 
-  const { imageUrl, title, category, author, price, description, features, rating, reviews } = product;
-
+  // Product is found, render its details
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="md:flex md:space-x-8">
-        {/* Image Gallery Section (Simplified for now) */}
-        <div className="md:w-1/2 mb-8 md:mb-0">
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-auto object-cover rounded-lg shadow-lg"
-            onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/800x600.png?text=Image+Error'; }}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
+        {/* Image Gallery (Simplified) */}
+        <div className="w-full aspect-[4/3] md:aspect-square rounded-lg overflow-hidden shadow-lg">
+          <img 
+            src={product.imageUrl || '/images/generic_image_error.jpg'} // Fallback if imageUrl is missing
+            alt={product.title} 
+            className="w-full h-full object-cover"
+            onError={(e) => { 
+              e.target.onerror = null; 
+              e.target.src = '/images/generic_image_error.jpg'; 
+            }}
           />
-          {/* TODO: Add thumbnail gallery for multiple images later */}
         </div>
 
-        {/* Product Info Section */}
-        <div className="md:w-1/2">
-          <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-            {category}
-          </span>
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3">
-            {title}
+        {/* Product Info */}
+        <div className="flex flex-col">
+          <Link 
+            to="/products" 
+            className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-2"
+          >
+            &larr; Back to Products
+          </Link>
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            {product.title}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            By <span className="font-semibold text-gray-700 dark:text-gray-300">{author}</span>
+          <p className="text-md text-gray-500 dark:text-gray-400 mb-3">
+            By <span className="font-semibold text-gray-700 dark:text-gray-300">{product.authorName || product.author}</span> in <span className="font-semibold text-gray-700 dark:text-gray-300">{product.category}</span>
           </p>
 
-          {/* Rating Placeholder */}
-          <div className="flex items-center mb-4">
-            {[...Array(Math.floor(rating || 0))].map((_, i) => (
-              <svg key={`star-filled-${i}`} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 .09l2.939 5.865 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-            ))}
-            {[...Array(5 - Math.floor(rating || 0))].map((_, i) => (
-              <svg key={`star-empty-${i}`} className="w-5 h-5 text-gray-300 dark:text-gray-600 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 .09l2.939 5.865 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-            ))}
-            <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">({reviews} reviews)</span>
+          <div className="mb-4">
+            <StarRating rating={product.rating || 0} reviewsCount={product.reviewsCount || 0} />
           </div>
 
           <p className="text-3xl font-extrabold text-gray-900 dark:text-white mb-6">
-            {price}
+            ${parseFloat(product.price).toFixed(2)} {/* Ensure price is formatted */}
           </p>
 
-          <div className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-6">
-            <p className="text-gray-700 dark:text-gray-300">
-              {description}
-            </p>
+          <div className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-6 text-gray-700 dark:text-gray-300">
+            <p>{product.description}</p>
           </div>
 
-          {features && features.length > 0 && (
+          {product.features && product.features.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Features:</h3>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Key Features:</h3>
               <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-                {features.map((feature, index) => (
+                {product.features.map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
             </div>
           )}
+          {product.demoUrl && (
+            <div className="mb-6">
+                <a 
+                    href={product.demoUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+                >
+                    View Live Demo &rarr;
+                </a>
+            </div>
+          )}
 
-          {/* Action Buttons */}
-          <div className="flex space-x-4">
-            <button className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:-translate-y-0.5">
-              Add to Cart
-            </button>
-            <button className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out">
-              Add to Wishlist
-            </button>
-          </div>
+          <button 
+            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out"
+          >
+            Add to Cart / Purchase {/* Placeholder Action */}
+          </button>
         </div>
-      </div>
-
-      {/* TODO: Reviews Section, Related Products Section */}
-      <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Customer Reviews</h2>
-        {/* Placeholder for reviews */}
-        <p className="text-gray-600 dark:text-gray-400">No reviews yet. Be the first to review this product!</p>
       </div>
     </div>
   );
