@@ -1,9 +1,7 @@
 const HomePage = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="p-4 bg-white dark:bg-black text-black dark:text-white">
-  DARK MODE TEST: Should change color
-</div>
+      
 
       <header className="text-center my-12">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white">

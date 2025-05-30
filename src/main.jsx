@@ -1,14 +1,17 @@
-// src/main.jsx
+// folioxe/src/main.jsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';  // Ensure index.css is imported here
 import App from './App.jsx';
+import './index.css';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
+import { AuthProvider } from './contexts/AuthContext.jsx'; // 1. Import AuthProvider
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>
-      <App />
+      <AuthProvider> {/* 2. Wrap App with AuthProvider */}
+        <App />
+      </AuthProvider>
     </ThemeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -1,25 +1,34 @@
-// src/App.jsx
+// folioxe/src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar.jsx';
+import Footer from './components/layout/Footer.jsx';
 import HomePage from './pages/HomePage.jsx';
-import { ThemeProvider } from './contexts/ThemeContext.jsx'; // Import ThemeProvider
+import ProductListingPage from './pages/ProductListingPage.jsx';
+import ProductDetailPage from './pages/ProductDetailPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import SignupPage from './pages/SignupPage.jsx'; // 1. Import SignupPage
 
 function App() {
   return (
-    <ThemeProvider>
-      <Router>
-        <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              {/* Add more routes as needed */}
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </ThemeProvider>
+    <Router future={{
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    }}>
+      <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+        <Navbar />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<ProductListingPage />} />
+            <Route path="/product/:slug" element={<ProductDetailPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} /> {/* 2. Add the signup route */}
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
