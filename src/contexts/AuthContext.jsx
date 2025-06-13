@@ -1,6 +1,6 @@
 // folioxe/src/contexts/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { auth } from '../firebase.js'; // Ensure this path is correct
+import { auth } from '../firebase.js';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,7 +10,7 @@ import {
   signInWithPopup,
   updateProfile,
   sendEmailVerification,
-  sendPasswordResetEmail // Make sure this is imported if you're using it elsewhere
+  sendPasswordResetEmail
 } from "firebase/auth";
 
 const AuthContext = createContext(null);
@@ -30,13 +30,12 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log("--- onAuthStateChanged Triggered ---"); // For flow tracking
+      console.log("--- onAuthStateChanged ---");
       if (firebaseUser) {
-        // LOGS TO CHECK FOR DISPLAYNAME FROM onAuthStateChanged
         console.log("onAuthStateChanged: FirebaseUser Object RECVD:", firebaseUser);
         console.log("onAuthStateChanged: FirebaseUser UID:", firebaseUser.uid);
         console.log("onAuthStateChanged: FirebaseUser Email:", firebaseUser.email);
-        console.log("onAuthStateChanged: FirebaseUser displayName FROM FIREBASE:", firebaseUser.displayName); // <<< THIS IS A KEY LOG
+        console.log("onAuthStateChanged: FirebaseUser displayName FROM FIREBASE:", firebaseUser.displayName);
         console.log("onAuthStateChanged: FirebaseUser emailVerified:", firebaseUser.emailVerified);
         console.log("onAuthStateChanged: FirebaseUser Provider Data:", firebaseUser.providerData);
 
@@ -47,7 +46,7 @@ export const AuthProvider = ({ children }) => {
             displayName: firebaseUser.displayName,
             emailVerified: firebaseUser.emailVerified,
           });
-          setIsAuthenticated(false);
+          setIsAuthenticated(false); 
         } else {
           setUser({
             uid: firebaseUser.uid,
@@ -74,7 +73,6 @@ export const AuthProvider = ({ children }) => {
         console.log("Signup: User created. UID:", userCredential.user.uid);
         console.log("Signup: Attempting to update profile. DisplayName to set:", name);
         await updateProfile(userCredential.user, { displayName: name });
-        // Log what auth.currentUser has immediately after updateProfile
         console.log("Signup: updateProfile call finished. Current Firebase user (auth.currentUser) displayName:", auth.currentUser?.displayName);
 
         await sendEmailVerification(userCredential.user);
@@ -98,7 +96,6 @@ export const AuthProvider = ({ children }) => {
         verificationError.code = 'auth/email-not-verified';
         throw verificationError;
       }
-      // onAuthStateChanged will handle setting user state based on userCredential.user
       return userCredential.user;
     } catch (error) {
       console.error("Firebase login error:", error.code, error.message);
@@ -110,12 +107,10 @@ export const AuthProvider = ({ children }) => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      console.log("--- loginWithGoogle successful ---"); // For flow tracking
-      // LOGS TO CHECK FOR DISPLAYNAME FROM GOOGLE SIGN-IN POPUP RESULT
+      console.log("--- loginWithGoogle successful ---");
       console.log("loginWithGoogle: result.user object:", result.user);
-      console.log("loginWithGoogle: result.user.displayName FROM GOOGLE/FIREBASE:", result.user.displayName); // <<< THIS IS A KEY LOG
+      console.log("loginWithGoogle: result.user.displayName FROM GOOGLE/FIREBASE:", result.user.displayName);
       console.log("loginWithGoogle: result.user.email:", result.user.email);
-      // onAuthStateChanged will be triggered by signInWithPopup and set the global user state
       return result.user;
     } catch (error) {
       console.error("Firebase Google login error:", error.code, error.message);
@@ -126,7 +121,6 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await signOut(auth);
-      // onAuthStateChanged will handle setting user to null
     } catch (error) {
       console.error("Firebase logout error:", error.code, error.message);
       throw error;
@@ -134,7 +128,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const resendVerificationEmail = async () => {
-    // Check if auth.currentUser is available and email is not verified
     if (auth.currentUser && auth.currentUser.providerData.some(p => p.providerId === 'password') && !auth.currentUser.emailVerified) {
       try {
         await sendEmailVerification(auth.currentUser);

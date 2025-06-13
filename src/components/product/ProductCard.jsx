@@ -1,8 +1,15 @@
 // folioxe/src/components/product/ProductCard.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../../contexts/CartContext.jsx';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const ProductCard = ({ product }) => {
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const {
     imageUrl = '/src/assets/image/default1.jpg', // Default local image
     title = 'Awesome Product Title',
@@ -48,6 +55,37 @@ const ProductCard = ({ product }) => {
             {price}
           </p>
         </div>
+      {/* Add to Cart Button */}
+        <button
+          onClick={async () => {
+            if (!isAuthenticated) {
+              await Swal.fire({
+                icon: 'info',
+                title: 'Login Required',
+                text: 'Please log in to add products to your cart.',
+                confirmButtonText: 'Go to Login',
+                confirmButtonColor: '#2563eb',
+              });
+              navigate('/login');
+              return;
+            }
+            // Ensure product has an id for cart logic
+            const cartProduct = { ...product, id: product.id || product.slug };
+            addToCart(cartProduct);
+            Swal.fire({
+              icon: 'success',
+              title: 'Added to Cart',
+              text: `${product.title || product.name} has been added to your cart!`,
+              timer: 1200,
+              showConfirmButton: false,
+              position: 'top-end',
+              toast: true,
+            });
+          }}
+          className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors"
+        >
+          Add to Cart
+        </button>
       </div>
     </div>
   );

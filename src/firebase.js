@@ -6,13 +6,12 @@ import { getFirestore } from "firebase/firestore"; // 1. Import getFirestore
 
 // Your web app's Firebase configuration (ensure this is correct)
 const firebaseConfig = {
-  apiKey: "AIzaSyBL06dBwZl0E6k93WrlZe0hwoKkYbA2h4U", // Your actual API key
-  authDomain: "folioxe-client.firebaseapp.com",
-  projectId: "folioxe-client",
-  storageBucket: "folioxe-client.appspot.com", // Or .firebasestorage.app if that's what Firebase gave you
-  messagingSenderId: "717885827096",
-  appId: "1:717885827096:web:9ee4c61ba61f937411fb6d",
-  measurementId: "G-RM6VGENVSB" // Optional
+  apiKey: "AIzaSyDmVDo113V1eXWePVF7UzJTeImy5cERj6c",
+  authDomain: "folioxe.firebaseapp.com",
+  projectId: "folioxe",
+  storageBucket: "folioxe.firebasestorage.app",
+  messagingSenderId: "24755386035",
+  appId: "1:24755386035:web:06060aa42a521d4e9ee2c6"
 };
 
 // Initialize Firebase

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'; // 1. Import useRef
 import { useTheme } from '../../contexts/ThemeContext.jsx';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Link, useNavigate, useLocation } from 'react-router-dom'; // Added useLocation
+import { useCart } from '../../contexts/CartContext.jsx';
 
 // Icons (MoonIcon, SunIcon, MenuIcon, XIcon - assuming they are defined above as before or imported)
 // For brevity, I'll assume they are defined. If not, please re-add their SVG definitions.
@@ -12,12 +13,22 @@ const MenuIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" vie
 const XIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg> );
 
 
+const CartIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.272 1.016M7.5 14.25A3.75 3.75 0 0 0 11.25 18h1.5a3.75 3.75 0 0 0 3.75-3.75V6.75m-9 7.5V6.75m0 0L5.25 4.5m2.25 2.25h9.75m0 0l1.5 2.25m-1.5-2.25V18a3.75 3.75 0 0 1-3.75 3.75h-1.5A3.75 3.75 0 0 1 6.75 18V6.75z" />
+  </svg>
+);
+
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { isAuthenticated, user, logout, loading: authLoading } = useAuth();
+  const { totalItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation(); // For closing mobile menu on route change
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const lastScrollY = useRef(0);
 
   const mobileMenuRef = useRef(null); // Ref for the mobile menu itself
   const mobileMenuButtonRef = useRef(null); // Ref for the hamburger button
@@ -63,6 +74,26 @@ const Navbar = () => {
     };
   }, [isMobileMenuOpen]); // Re-run effect if isMobileMenuOpen changes
 
+  // Effect for scroll transparency
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+      if (window.scrollY < 40) {
+        setShowNavbar(true);
+        lastScrollY.current = window.scrollY;
+        return;
+      }
+      if (window.scrollY > lastScrollY.current && window.scrollY > 60) {
+        setShowNavbar(false); // scrolling down
+      } else if (window.scrollY < lastScrollY.current) {
+        setShowNavbar(true); // scrolling up
+      }
+      lastScrollY.current = window.scrollY;
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
 
   // Effect to close mobile menu on route change
   useEffect(() => {
@@ -91,6 +122,20 @@ const Navbar = () => {
     <>
       {isAuthenticated ? (
         <>
+          <Link 
+            to="/submit-product"
+            className={`text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isMobile ? 'block' : 'inline-block'}`}
+            onClick={() => isMobile && setIsMobileMenuOpen(false)}
+          >
+            Submit Product
+          </Link>
+          <Link 
+            to="/seller-dashboard"
+            className={`text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isMobile ? 'block' : 'inline-block'}`}
+            onClick={() => isMobile && setIsMobileMenuOpen(false)}
+          >
+            Dashboard
+          </Link>
           <Link 
             to="/profile"
             className={`text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isMobile ? 'block' : 'inline-block'}`}
@@ -126,8 +171,25 @@ const Navbar = () => {
     </>
   );
 
+  // Calculate opacity: 0.95 at top, 0.6 at 200px+, linear in between
+  const minOpacity = 0.6;
+  const maxOpacity = 0.95;
+  const scrollMax = 200;
+  const opacity = scrollY < 0 ? maxOpacity : scrollY > scrollMax ? minOpacity : maxOpacity - ((maxOpacity - minOpacity) * (scrollY / scrollMax));
+
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+    <nav
+      className="shadow-md sticky top-0 z-50 transition-colors duration-500"
+      style={{
+        background: theme === 'dark'
+          ? `rgba(31,41,55,${opacity})` // dark:bg-gray-800
+          : `rgba(255,255,255,${opacity})`, // bg-white
+        backdropFilter: 'saturate(180%) blur(12px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(12px)',
+        transform: showNavbar ? 'translateY(0)' : 'translateY(-110%)',
+        transition: 'transform 0.4s cubic-bezier(.4,0,.2,1), background 0.5s',
+      }}
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Main Nav Links (Desktop) */}
@@ -144,6 +206,17 @@ const Navbar = () => {
 
           {/* Right side: Auth Links (Desktop) & Theme Toggle */}
           <div className="hidden md:flex items-center space-x-3">
+            {/* Cart Icon (only if logged in) */}
+            {isAuthenticated && (
+              <Link to="/cart" className="relative p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="View cart">
+                <CartIcon />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
             {!authLoading && <AuthLinksContent isMobile={false} />}
             <button
               onClick={toggleTheme}
@@ -156,7 +229,18 @@ const Navbar = () => {
 
           {/* Mobile Menu Button (Hamburger) */}
           <div className="md:hidden flex items-center">
-             <button
+            {/* Cart Icon (Mobile, only if logged in) */}
+            {isAuthenticated && (
+              <Link to="/cart" className="relative p-2 mr-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="View cart">
+                <CartIcon />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
+            <button
               onClick={toggleTheme}
               className="p-2 mr-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               aria-label="Toggle theme"
