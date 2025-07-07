@@ -146,8 +146,8 @@ const Analytics = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading analytics...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading analytics...</p>
         </div>
       </div>
     );
@@ -187,65 +187,65 @@ const Analytics = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Users */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalUsers}</p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Total Users</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{stats.totalUsers}</p>
+              <p className="text-xs" style={{ color: '#22c55e' }}>
                 +{getGrowthRate(stats.totalUsers, Math.floor(stats.totalUsers * 0.9))}% from last period
               </p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#1e40af' }}>
+              <Users className="w-6 h-6" style={{ color: '#60a5fa' }} />
             </div>
           </div>
         </div>
 
         {/* Total Products */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Products</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalProducts}</p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Total Products</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{stats.totalProducts}</p>
+              <p className="text-xs" style={{ color: '#22c55e' }}>
                 +{getGrowthRate(stats.totalProducts, Math.floor(stats.totalProducts * 0.85))}% from last period
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-              <Package className="w-6 h-6 text-green-600 dark:text-green-400" />
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#166534' }}>
+              <Package className="w-6 h-6" style={{ color: '#6ee7b7' }} />
             </div>
           </div>
         </div>
 
         {/* Total Reviews */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Reviews</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalReviews}</p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Total Reviews</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{stats.totalReviews}</p>
+              <p className="text-xs" style={{ color: '#22c55e' }}>
                 +{getGrowthRate(stats.totalReviews, Math.floor(stats.totalReviews * 0.8))}% from last period
               </p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#7c3aed' }}>
+              <MessageSquare className="w-6 h-6" style={{ color: '#c4b5fd' }} />
             </div>
           </div>
         </div>
 
         {/* Total Revenue */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(stats.totalRevenue)}</p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Total Revenue</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{formatCurrency(stats.totalRevenue)}</p>
+              <p className="text-xs" style={{ color: '#22c55e' }}>
                 +{getGrowthRate(stats.totalRevenue, Math.floor(stats.totalRevenue * 0.75))}% from last period
               </p>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#ca8a04' }}>
+              <DollarSign className="w-6 h-6" style={{ color: '#fde68a' }} />
             </div>
           </div>
         </div>
@@ -254,7 +254,7 @@ const Analytics = () => {
       {/* Additional Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Pending Items */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Pending Items</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -273,7 +273,7 @@ const Analytics = () => {
         </div>
 
         {/* User Status */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">User Status</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -292,7 +292,7 @@ const Analytics = () => {
         </div>
 
         {/* Platform Health */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Platform Health</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -314,7 +314,7 @@ const Analytics = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Activity Chart */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
             <BarChart3 className="w-5 h-5 text-gray-400" />
@@ -349,7 +349,7 @@ const Analytics = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="card p-6">
+        <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Quick Stats</h3>
             <TrendingUp className="w-5 h-5 text-gray-400" />
@@ -403,7 +403,7 @@ const Analytics = () => {
       </div>
 
       {/* Export Section */}
-      <div className="card p-6">
+      <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Export Data</h3>

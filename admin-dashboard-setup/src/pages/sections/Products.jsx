@@ -114,8 +114,8 @@ const Products = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading products...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading products...</p>
         </div>
       </div>
     );
@@ -190,9 +190,9 @@ const Products = () => {
       {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts.map(product => (
-          <div key={product.id} className="card overflow-hidden hover:shadow-lg transition-shadow">
+          <div key={product.id} className="card overflow-hidden hover:shadow-lg transition-shadow" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
             {/* Product Image */}
-            <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
+            <div className="relative h-48" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
               {product.imageUrl ? (
                 <img
                   src={product.imageUrl}
@@ -201,7 +201,7 @@ const Products = () => {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <ImageIcon className="w-12 h-12 text-gray-400" />
+                  <ImageIcon className="w-12 h-12" style={{ color: 'var(--text-primary)' }} />
                 </div>
               )}
               <div className="absolute top-2 right-2">
@@ -213,23 +213,23 @@ const Products = () => {
 
             {/* Product Info */}
             <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+              <h3 className="text-lg font-semibold mb-2 line-clamp-2" style={{ color: 'var(--text-primary)' }}>
                 {product.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+              <p className="text-sm mb-3 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
                 {product.description}
               </p>
 
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
-                  <Tag className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <Tag className="w-4 h-4" style={{ color: 'var(--text-primary)' }} />
+                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {product.category}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <DollarSign className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  <DollarSign className="w-4 h-4" style={{ color: 'var(--text-primary)' }} />
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                     ${product.price}
                   </span>
                 </div>
@@ -237,14 +237,14 @@ const Products = () => {
 
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <User className="w-4 h-4" style={{ color: 'var(--text-primary)' }} />
+                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {product.submittedBy}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Calendar className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <Calendar className="w-4 h-4" style={{ color: 'var(--text-primary)' }} />
+                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {product.createdAt?.toLocaleDateString()}
                   </span>
                 </div>
@@ -288,8 +288,8 @@ const Products = () => {
 
       {/* Product Detail Modal */}
       {showProductModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="modal-overlay fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="modal rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">

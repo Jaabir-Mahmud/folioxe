@@ -122,8 +122,8 @@ const Users = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading users...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading users...</p>
         </div>
       </div>
     );
@@ -198,8 +198,8 @@ const Users = () => {
       {/* Users Table */}
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+          <table className="min-w-full divide-y" style={{ backgroundColor: 'var(--table-row-bg)', color: 'var(--text-primary)' }}>
+            <thead style={{ backgroundColor: 'var(--table-header-bg)', color: 'var(--text-primary)' }}>
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   User
@@ -220,19 +220,19 @@ const Users = () => {
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredUsers.map(user => (
-                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <tr key={user.id} style={{ backgroundColor: 'var(--table-row-bg)', color: 'var(--text-primary)' }} className="hover:bg-[#232b3b]">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                        <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                      <div className="w-10 h-10 rounded-full" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
+                        <span className="text-sm font-medium" style={{ color: '#fff' }}>
                           {user.email?.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                           {user.email}
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                           ID: {user.id}
                         </div>
                       </div>
@@ -254,10 +254,10 @@ const Users = () => {
                       {user.banned ? 'Banned' : 'Active'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {user.createdAt?.toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => {
@@ -297,8 +297,8 @@ const Users = () => {
 
       {/* User Detail Modal */}
       {showUserModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="modal-overlay fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="modal rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -314,8 +314,8 @@ const Users = () => {
               
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <span className="text-xl font-medium text-blue-600 dark:text-blue-400">
+                  <div className="w-16 h-16 rounded-full" style={{ backgroundColor: '#232b3b', border: '1px solid var(--border-primary)' }}>
+                    <span className="text-xl font-medium" style={{ color: '#fff' }}>
                       {selectedUser.email?.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -323,7 +323,7 @@ const Users = () => {
                     <h4 className="text-lg font-medium text-gray-900 dark:text-white">
                       {selectedUser.email}
                     </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                       User ID: {selectedUser.id}
                     </p>
                   </div>

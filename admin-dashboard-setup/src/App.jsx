@@ -13,7 +13,7 @@ function App() {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <div className="app-container">
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/create-admin" element={<CreateAdminPage />} />

@@ -21,16 +21,10 @@ export const ThemeProvider = ({ children }) => {
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
     localStorage.setItem('admin-theme', theme);
-    console.log('Theme changed to:', theme);
-    console.log('HTML classes:', root.classList.toString());
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prevTheme => {
-      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-      console.log('Toggling theme from', prevTheme, 'to', newTheme);
-      return newTheme;
-    });
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   };
 
   const value = {

@@ -124,8 +124,8 @@ const Reviews = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading reviews...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading reviews...</p>
         </div>
       </div>
     );
@@ -202,7 +202,7 @@ const Reviews = () => {
       {/* Reviews List */}
       <div className="space-y-4">
         {filteredReviews.map(review => (
-          <div key={review.id} className="card p-6 hover:shadow-lg transition-shadow">
+          <div key={review.id} className="card p-6 hover:shadow-lg transition-shadow" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 {/* Review Header */}
@@ -292,8 +292,8 @@ const Reviews = () => {
 
       {/* Review Detail Modal */}
       {showReviewModal && selectedReview && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="modal-overlay fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="modal rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">

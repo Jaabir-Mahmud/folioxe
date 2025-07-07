@@ -139,8 +139,8 @@ const Settings = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading settings...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading settings...</p>
         </div>
       </div>
     );
@@ -180,7 +180,7 @@ const Settings = () => {
       </div>
 
       {/* Tabs */}
-      <div className="card p-6">
+      <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
         <div className="flex flex-wrap gap-2">
           {tabs.map(tab => {
             const Icon = tab.icon;

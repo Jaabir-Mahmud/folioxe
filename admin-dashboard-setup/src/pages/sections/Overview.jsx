@@ -12,8 +12,10 @@ import {
 } from 'lucide-react';
 import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { useNavigate } from 'react-router-dom';
 
 const Overview = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalProducts: 0,
@@ -122,13 +124,13 @@ const Overview = () => {
   };
 
   const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
-    <div className="card p-6">
+    <div className="card p-6" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
+          <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{title}</p>
+          <p className="text-2xl font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{value}</p>
           {subtitle && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-primary)', opacity: 0.7 }}>{subtitle}</p>
           )}
         </div>
         <div className={`p-3 rounded-lg ${color}`}>
@@ -142,16 +144,18 @@ const Overview = () => {
     const getIcon = () => {
       switch (activity.type) {
         case 'product':
-          return <Package className="w-4 h-4" />;
+          return <Package className="w-4 h-4" style={{ color: 'var(--text-primary)', opacity: 0.8 }} />;
         case 'review':
-          return <Star className="w-4 h-4" />;
+          return <Star className="w-4 h-4" style={{ color: 'var(--text-primary)', opacity: 0.8 }} />;
         default:
-          return <Activity className="w-4 h-4" />;
+          return <Activity className="w-4 h-4" style={{ color: 'var(--text-primary)', opacity: 0.8 }} />;
       }
     };
 
     const getStatusColor = () => {
-      return activity.status === 'approved' ? 'text-green-600' : 'text-yellow-600';
+      return activity.status === 'approved' 
+        ? 'text-green-500' 
+        : 'text-yellow-400';
     };
 
     const getStatusIcon = () => {
@@ -161,19 +165,19 @@ const Overview = () => {
     };
 
     return (
-      <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
-        <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+      <div className="flex items-center space-x-3 p-3 hover:bg-[#232b3b] rounded-lg transition-colors">
+        <div className="p-2" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
           {getIcon()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+          <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
             {activity.title}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs" style={{ color: 'var(--text-primary)', opacity: 0.7 }}>
             by {activity.user}
           </p>
         </div>
-        <div className={`flex items-center space-x-1 ${getStatusColor()}`}>
+        <div className={`flex items-center space-x-1 ${getStatusColor()}`} style={{ color: activity.status === 'approved' ? '#22c55e' : '#fde047' }}>
           {getStatusIcon()}
           <span className="text-xs font-medium capitalize">{activity.status}</span>
         </div>
@@ -185,20 +189,20 @@ const Overview = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading dashboard...</p>
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Welcome to your FolioXe admin dashboard
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Dashboard Overview</h1>
+        <p className="mt-1" style={{ color: 'var(--text-primary)', opacity: 0.8 }}>
+          Welcome to your FolioXe admin dashboard. Here's what's happening today.
         </p>
       </div>
 
@@ -223,38 +227,36 @@ const Overview = () => {
           value={stats.totalReviews}
           icon={Star}
           color="bg-yellow-500"
-          subtitle={`${stats.pendingReviews} pending approval`}
+          subtitle={`${stats.pendingReviews} pending moderation`}
         />
         <StatCard
           title="Total Revenue"
           value={`$${stats.totalRevenue.toFixed(2)}`}
           icon={DollarSign}
           color="bg-purple-500"
-          subtitle="From all purchases"
+          subtitle="All time sales"
         />
       </div>
 
-      {/* Quick Actions */}
+      {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activity */}
         <div className="card">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-              <Activity className="w-5 h-5 mr-2" />
-              Recent Activity
-            </h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Recent Activity</h2>
+            <p className="text-sm" style={{ color: 'var(--text-primary)', opacity: 0.8 }}>Latest updates from your platform</p>
           </div>
-          <div className="p-6">
+          <div className="p-4">
             {stats.recentActivity.length > 0 ? (
               <div className="space-y-2">
                 {stats.recentActivity.map((activity, index) => (
-                  <ActivityItem key={`${activity.type}-${activity.id}-${index}`} activity={activity} />
+                  <ActivityItem key={index} activity={activity} />
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                No recent activity
-              </p>
+              <div className="text-center py-8">
+                <Activity className="w-12 h-12" style={{ color: 'var(--text-primary)', opacity: 0.5, margin: '0 auto 1rem' }} />
+                <p style={{ color: 'var(--text-primary)', opacity: 0.7 }}>No recent activity</p>
+              </div>
             )}
           </div>
         </div>
@@ -262,22 +264,23 @@ const Overview = () => {
         {/* Quick Actions */}
         <div className="card">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Quick Actions</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Quick Actions</h2>
+            <p className="text-sm" style={{ color: 'var(--text-primary)', opacity: 0.8 }}>Common administrative tasks</p>
           </div>
-          <div className="p-6 space-y-3">
-            <button className="w-full btn-primary flex items-center justify-center">
+          <div className="p-4 space-y-3">
+            <button className="w-full btn-primary" onClick={() => navigate('/dashboard/products')}>
               <Package className="w-4 h-4 mr-2" />
-              Review Pending Products ({stats.pendingProducts})
+              Review Pending Products
             </button>
-            <button className="w-full btn-secondary flex items-center justify-center">
+            <button className="w-full btn-secondary" onClick={() => navigate('/dashboard/reviews')}>
               <Star className="w-4 h-4 mr-2" />
-              Moderate Reviews ({stats.pendingReviews})
+              Moderate Reviews
             </button>
-            <button className="w-full btn-secondary flex items-center justify-center">
+            <button className="w-full btn-secondary" onClick={() => navigate('/dashboard/users')}>
               <Users className="w-4 h-4 mr-2" />
               Manage Users
             </button>
-            <button className="w-full btn-secondary flex items-center justify-center">
+            <button className="w-full btn-secondary" onClick={() => navigate('/dashboard/analytics')}>
               <TrendingUp className="w-4 h-4 mr-2" />
               View Analytics
             </button>
@@ -288,4 +291,4 @@ const Overview = () => {
   );
 };
 
-export default Overview; 
+export default Overview;
